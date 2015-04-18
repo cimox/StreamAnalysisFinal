@@ -27,7 +27,7 @@ public class PrintToFile implements IRichBolt {
                 // If file is not opened, then open it and save to list of opened files.
                 openFile(null);
             }
-            System.out.println(-1.0 + " " + tweet);
+//            System.out.println(-1.0 + " " + tweet);
             printToFile(null, tweet, -1.0);
         } catch (NullPointerException nullErr) {
             System.err.println("[ERROR] in " + Thread.currentThread() + " " + nullErr.getMessage());

@@ -2,6 +2,9 @@ package edu.cimo;
 
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
+import backtype.storm.StormSubmitter;
+import backtype.storm.generated.AlreadyAliveException;
+import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.generated.StormTopology;
 import backtype.storm.utils.Utils;
 import edu.cimo.builder.TwitterTopologyBuilder;
@@ -15,7 +18,7 @@ public class LocalTopologyRunner {
     private static final int ONE_MINUTE = 60000;
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws AlreadyAliveException, InvalidTopologyException {
         // Create topology
         StormTopology topology = TwitterTopologyBuilder.build();
 
@@ -34,5 +37,10 @@ public class LocalTopologyRunner {
         Utils.sleep(ONE_MINUTE * 1);
         cluster.killTopology("twitter-live-stream-topology");
         cluster.shutdown();
+
+        // Remote cluster
+//        StormSubmitter.submitTopologyWithProgressBar("production-deploy-test-2", config, topology);
+
     }
+
 }
