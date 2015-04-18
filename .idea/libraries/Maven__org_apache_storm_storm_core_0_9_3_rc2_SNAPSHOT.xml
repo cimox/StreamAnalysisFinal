@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.apache.storm:storm-core:0.9.3-rc2-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/storm/storm-core/0.9.3-rc2-SNAPSHOT/storm-core-0.9.3-rc2-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/storm/storm-core/0.9.3-rc2-SNAPSHOT/storm-core-0.9.3-rc2-SNAPSHOT-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/storm/storm-core/0.9.3-rc2-SNAPSHOT/storm-core-0.9.3-rc2-SNAPSHOT-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
