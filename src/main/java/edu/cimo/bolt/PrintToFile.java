@@ -5,7 +5,9 @@ import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.IRichBolt;
 import backtype.storm.topology.OutputFieldsDeclarer;
+import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+import edu.cimo.util.Timestamp;
 import twitter4j.JSONException;
 import twitter4j.JSONObject;
 
@@ -19,19 +21,21 @@ import java.util.Map;
 public class PrintToFile implements IRichBolt {
     private Long _cnt;
     private HashMap<String, BufferedWriter> _files;
+    private String _threadName;
 
     @Override
     public synchronized void execute(Tuple tuple) {
-        JSONObject tweet = (JSONObject) tuple.getValueByField("tweet"); // Get tweet JSONObject
+        Fields fields = tuple.getFields(); // Fields("hashtag", "times", "created_at", "id", "user", "text")
         String hashtag = (String) tuple.getValueByField("hashtag");
 
         try {
-            if (!_files.containsKey(null)) {
+            if (!_files.containsKey(hashtag)) {
                 // If file is not opened, then open it and save to list of opened files.
-                openFile(null);
+                openFile(hashtag);
             }
-            System.out.println(-1.0 + " " + tweet);
-            printToFile(null, tweet, -1.0);
+
+
+            printToFile(hashtag, tuple);
         } catch (NullPointerException nullErr) {
             System.err.println("[ERROR] in " + Thread.currentThread() + " " + nullErr.getMessage());
         } catch (IOException errIO) {
@@ -55,11 +59,12 @@ public class PrintToFile implements IRichBolt {
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         _cnt = new Long(0);
         _files = new HashMap<String, BufferedWriter>(1);
+        _threadName = Thread.currentThread().getName();
     }
 
     @Override
     public void cleanup() {
-        System.out.println("-------\n[" + Thread.currentThread() + "]");
+        System.out.println("--- [INFO] ---\n[" + _threadName + "]");
         System.out.println("msgs processed: " + _cnt);
 
         for (String query : _files.keySet()) {
@@ -70,7 +75,7 @@ public class PrintToFile implements IRichBolt {
                 System.err.println("[ERROR] in " + Thread.currentThread() + " " + e.getMessage());
             }
         }
-        System.out.println("-------\n");
+        System.out.println("--------------");
     }
 
     private synchronized void openFile(String query) throws IOException {
@@ -79,11 +84,22 @@ public class PrintToFile implements IRichBolt {
         _files.put(query, writer);
     }
 
-    private synchronized void printToFile(String query, JSONObject tweet, Double tweetTime) throws IOException, JSONException {
+    private synchronized void printToFile(String query, Tuple tweet) throws IOException, JSONException {
+        HashMap<String, Long> times = (HashMap<String, Long>) tweet.getValueByField("times");
+        long tweetTime = System.nanoTime() - times.get("timestamp-enter");
+        Long enterTime = times.get("timestamp-enter");
 
-            // Print tweet time in nanos, tweet ID : text
-            _files.get(query).write("[" + tweetTime + "] " + tweet.getString("id_str") + ":" + tweet.getString("text") + "\n");
-//            _files.get(query).write("[" + tweetTime + "] " + tweet + "\n");
-            _cnt++;
+        // Print tweet time in nanos, tweet ID : text
+        _files.get(query).write("total-time[" + tweetTime + "],"
+                + "timestamp-enter[" + enterTime + "],"
+                + "timestamp-hashtag-extract[" + ((Long )times.get("timestamp-hashtag-extract") - enterTime) + "],"
+                + "timestamp-filter[" + ((Long )times.get("timestamp-filter") - enterTime) + "],"
+                + "timestamp-data-extract[" + ((Long )times.get("timestamp-data-extract") - enterTime) + "],"
+                + "created_at[" + tweet.getValueByField("created_at") + "],"
+                + "id[" + tweet.getValueByField("id") + "],"
+                + "user[" + tweet.getValueByField("user") + "],"
+                + "text[" + tweet.getValueByField("text") + "],"
+                + "\n");
+        _cnt++;
     }
 }

@@ -4,11 +4,9 @@ import backtype.storm.generated.StormTopology;
 import backtype.storm.spout.SchemeAsMultiScheme;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
-import edu.cimo.bolt.FilterByHashtag;
-import edu.cimo.bolt.HashtagExtract;
+import edu.cimo.bolt.*;
 import edu.cimo.scheme.KafkaCustomScheme;
 import edu.cimo.spout.TwitterLiveSpout;
-import edu.cimo.bolt.PrintToFile;
 import storm.kafka.KafkaSpout;
 import storm.kafka.SpoutConfig;
 import storm.kafka.ZkHosts;
@@ -35,7 +33,7 @@ public class TwitterTopologyBuilder {
         SpoutConfig kafkaConfig = new SpoutConfig(hosts, "tweet", "/tweet", UUID.randomUUID().toString());
         kafkaConfig.scheme = new SchemeAsMultiScheme(new KafkaCustomScheme("tweet"));
         KafkaSpout kafkaSpout = new KafkaSpout(kafkaConfig);
-        builder.setSpout("SPOUT_twitter-live-feed", kafkaSpout, 1);
+        builder.setSpout("SPOUT_twitter-dataset-feed", kafkaSpout, 1);
 
         // Another Kafka spout emitting queries
         SpoutConfig kafkaConfigQuery = new SpoutConfig(hosts, "query", "/query", UUID.randomUUID().toString());
@@ -47,18 +45,26 @@ public class TwitterTopologyBuilder {
         /*
          * BOLTS
          */
+        // Get timestamp when tuple enter topology
+        builder.setBolt("BOLT_enter-timestamp", new EnterTopologyTimestamp(), 1)
+                .shuffleGrouping("SPOUT_twitter-dataset-feed");
+
         // At first, extract hashtags from tweets
         builder.setBolt("BOLT_hashtag-extract", new HashtagExtract(), 4)
-                .shuffleGrouping("SPOUT_twitter-live-feed");
+                .shuffleGrouping("BOLT_enter-timestamp");
 
         // Filter tweets based on hashtag queries
-        builder.setBolt("BOLT_hashtag-filer", new FilterByHashtag(), 4)
+        builder.setBolt("BOLT_hashtag-filter", new FilterByHashtag(), 4)
                 .fieldsGrouping("BOLT_hashtag-extract", new Fields("hashtag"))
                 .fieldsGrouping("SPOUT_query-feed", new Fields("query"));
 
+        // Extract only usable and data we wants
+        builder.setBolt("BOLT_data-extract", new DataExtract(), 1)
+                .shuffleGrouping("BOLT_hashtag-filter");
+
         // Finally, print filtered tweets to files.s
         builder.setBolt("BOLT_print-to-file", new PrintToFile(), 4)
-                .fieldsGrouping("BOLT_hashtag-filer", new Fields("hashtag"));
+                .fieldsGrouping("BOLT_data-extract", new Fields("hashtag"));
 
 
         return builder.createTopology();

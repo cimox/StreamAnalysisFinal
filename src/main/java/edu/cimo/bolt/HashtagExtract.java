@@ -7,6 +7,7 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
+import edu.cimo.util.Timestamp;
 import twitter4j.JSONArray;
 import twitter4j.JSONException;
 import twitter4j.JSONObject;
@@ -18,28 +19,37 @@ import java.util.Map;
  */
 public class HashtagExtract implements IRichBolt {
     private OutputCollector _collector;
+    private Long _cnt;
 
     @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         _collector = outputCollector;
+        _cnt = new Long(0);
     }
 
     @Override
     public void execute(Tuple tuple) {
-        JSONObject tweet = (JSONObject) tuple.getValueByField("tweet");
         try {
-            JSONArray hashtags = tweet.getJSONArray("hashtagEntities");
+            JSONObject tweet = (JSONObject) tuple.getValueByField("tweet");
+            JSONObject entities = tweet.getJSONObject("entities");
+            JSONArray hashtags = entities.getJSONArray("hashtags");
+            Timestamp.markWithTimestamp(tweet, "timestamp-hashtag-extract");
 
             // Iterate over all hashtags end emit
             for (int i = 0; i < hashtags.length(); i++) {
-                String tag = hashtags.getString(i);
+                String tag = hashtags.getJSONObject(i).getString("text");
                 _collector.emit(new Values(tag, tweet));
             }
-            if (hashtags == null) {
-                System.out.println("[INFO] Empty hashtags, nothing to emit.");
+            if (hashtags.length() == 0) {
+                // Nothing to emit, or emit as a NULL value
+//                System.out.println("[WARN] No hashtags, nothing to emit.");
+
+                // Emit hashtags as a NULL value
+//                System.out.println("[WARN] emitting WITH NO hashtags!!!");
+                _collector.emit(new Values(null, tweet));
             }
-        } catch (JSONException jsonerr) {
-            System.err.println("[ERROR] in thread " + Thread.currentThread() + ": " + jsonerr.getMessage());
+        } catch (JSONException e) {
+            System.err.println("[ERROR] in thread " + Thread.currentThread() + ": " + e.getMessage());
         }
 
         _collector.ack(tuple);

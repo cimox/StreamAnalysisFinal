@@ -8,6 +8,7 @@ import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.generated.StormTopology;
 import backtype.storm.utils.Utils;
 import edu.cimo.builder.TwitterTopologyBuilder;
+import twitter4j.JSONObject;
 
 
 /**
@@ -25,8 +26,9 @@ public class LocalTopologyRunner {
         // Config
         Config config = new Config();
         config.setFallBackOnJavaSerialization(false);
-        config.setNumWorkers(2);
-        config.setMessageTimeoutSecs(60);
+//        config.setNumWorkers(2);
+//        config.setMessageTimeoutSecs(60);
+//        config.registerSerialization(JSONObject.class);
 
         // Local cluster
         // I updated the "topology.spout.max.batch.size" value in config to about 64*1024 value and then storm processing became fast.
@@ -34,7 +36,7 @@ public class LocalTopologyRunner {
 
         // Submitting topology to local cluster and shutting down.
         cluster.submitTopology("twitter-live-stream-topology", config, topology);
-        Utils.sleep(ONE_MINUTE * 1);
+        Utils.sleep(ONE_MINUTE * 5);
         cluster.killTopology("twitter-live-stream-topology");
         cluster.shutdown();
 
