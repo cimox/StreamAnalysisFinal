@@ -1,4 +1,4 @@
-package spout;
+package edu.cimo.spout;
 
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;

@@ -1,9 +1,9 @@
-package builder;
+package edu.cimo.builder;
 
 import backtype.storm.generated.StormTopology;
 import backtype.storm.topology.TopologyBuilder;
-import spout.TwitterLiveSpout;
-import bolt.PrintToFile;
+import edu.cimo.spout.TwitterLiveSpout;
+import edu.cimo.bolt.PrintToFile;
 
 /**
  * Created by cimo on 17/04/15.

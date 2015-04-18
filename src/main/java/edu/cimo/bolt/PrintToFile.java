@@ -1,4 +1,4 @@
-package bolt;
+package edu.cimo.bolt;
 
 
 import backtype.storm.task.OutputCollector;

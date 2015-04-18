@@ -1,8 +1,10 @@
+package edu.cimo;
+
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.generated.StormTopology;
 import backtype.storm.utils.Utils;
-import builder.TwitterTopologyBuilder;
+import edu.cimo.builder.TwitterTopologyBuilder;
 
 
 /**
