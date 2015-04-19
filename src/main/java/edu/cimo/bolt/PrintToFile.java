@@ -79,7 +79,7 @@ public class PrintToFile implements IRichBolt {
     }
 
     private synchronized void openFile(String query) throws IOException {
-        FileWriter fileWriter = new FileWriter("/tmp/final-topology-" + query + ".txt", true);
+        FileWriter fileWriter = new FileWriter("/tmp/final-topology-" + query + ".csv", true);
         BufferedWriter writer = new BufferedWriter(fileWriter);
         writer.write("timestamp-enter,timestamp-hashtag-extract,timestamp-filter,timestamp-data-extract," +
                 "timestamp-exit,total-time,created_at,id,user,text\n");
@@ -102,7 +102,7 @@ public class PrintToFile implements IRichBolt {
                 + "\"" + tweet.getValueByField("created_at") + "\","
                 + "\"" + tweet.getValueByField("id") + "\","
                 + "\"" + tweet.getValueByField("user") + "\","
-                + "\"" + tweet.getValueByField("text") + "\""
+                + "\"" + tweet.getValueByField("text").toString().replace("\n", " ") + "\""
                 + "\n");
         // Print tweet time in nanos, tweet ID : text
         // Format do Redis-u

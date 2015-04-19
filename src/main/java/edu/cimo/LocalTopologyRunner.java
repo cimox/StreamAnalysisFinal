@@ -36,13 +36,11 @@ public class LocalTopologyRunner {
 
         // Submitting topology to local cluster and shutting down.
         cluster.submitTopology("twitter-live-stream-topology", config, topology);
-        Utils.sleep(ONE_MINUTE / 2);
+        Utils.sleep(ONE_MINUTE * 1);
         cluster.killTopology("twitter-live-stream-topology");
         cluster.shutdown();
 
         // Remote cluster
 //        StormSubmitter.submitTopologyWithProgressBar("production-deploy-test-2", config, topology);
-
     }
-
 }

@@ -116,7 +116,8 @@ public class TwitterLiveSpout extends BaseRichSpout {
             JSONObject tweetToEmit = new JSONObject(tweet);
             try {
                 String tweetText = tweetToEmit.getString("text");
-                _collector.emit(new Values(tweetText));
+//                _collector.emit(new Values(tweetText));
+                _collector.emit(new Values(tweetToEmit));
                 emittedTweetsCnt++;
             } catch (JSONException e) {
                 e.printStackTrace();

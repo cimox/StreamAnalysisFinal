@@ -59,7 +59,7 @@ public class TwitterTopologyBuilder {
                 .fieldsGrouping("SPOUT_query-feed", new Fields("query"));
 
         // Extract only usable and data we wants
-        builder.setBolt("BOLT_data-extract", new DataExtract(), 1)
+        builder.setBolt("BOLT_data-extract", new DataExtract(), 4)
                 .shuffleGrouping("BOLT_hashtag-filter");
 
         // Finally, print filtered tweets to files.s
