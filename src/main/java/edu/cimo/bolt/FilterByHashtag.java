@@ -48,7 +48,7 @@ public class FilterByHashtag implements IRichBolt {
             try {
                 if (_queries.containsKey(hashtag)) {
                     Timestamp.markWithTimestamp(tweet, "timestamp-filter");
-                    System.out.println("[INFO] MATCH filter [" + hashtag + "]! in " + _threadName + " > " + tweet.getString("text"));
+                    System.out.println("[INFO] MATCH filter [" + hashtag + "]! in " + _threadName + " > " + tweet.getString("text").replace("\n", " "));
 
                     // Emit hashtag/query and tweet and increment counter
                     _collector.emit(new Values(hashtag, tweet));

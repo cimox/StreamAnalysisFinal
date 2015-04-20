@@ -31,8 +31,7 @@ public class HashtagExtract implements IRichBolt {
     public void execute(Tuple tuple) {
         try {
             JSONObject tweet = (JSONObject) tuple.getValueByField("tweet");
-            JSONObject entities = tweet.getJSONObject("entities");
-            JSONArray hashtags = entities.getJSONArray("hashtags");
+            JSONArray hashtags = tweet.getJSONArray("hashtagEntities");
             Timestamp.markWithTimestamp(tweet, "timestamp-hashtag-extract");
 
             // Iterate over all hashtags end emit

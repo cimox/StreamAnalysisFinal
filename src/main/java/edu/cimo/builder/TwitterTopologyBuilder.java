@@ -46,7 +46,7 @@ public class TwitterTopologyBuilder {
          * BOLTS
          */
         // Get timestamp when tuple enter topology
-        builder.setBolt("BOLT_enter-timestamp", new EnterTopologyTimestamp(), 1)
+        builder.setBolt("BOLT_enter-timestamp", new EnterTopologyTimestamp(), 4)
                 .shuffleGrouping("SPOUT_twitter-dataset-feed");
 
         // At first, extract hashtags from tweets

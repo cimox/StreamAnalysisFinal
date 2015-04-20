@@ -41,10 +41,10 @@ public class DataExtract implements IRichBolt {
             times.put("timestamp-hashtag-extract", tweet.getLong("timestamp-hashtag-extract"));
             times.put("timestamp-filter", tweet.getLong("timestamp-filter"));
             times.put("timestamp-data-extract", tweet.getLong("timestamp-data-extract"));
-            String created_at = tweet.getString("created_at");
-            String id = tweet.getString("id_str"); // This need to be just id if data coming from live stream
+            String created_at = tweet.getString("createdAt");
+            String id = tweet.getString("id"); // This need to be just id if data coming from live stream
             JSONObject userObject = tweet.getJSONObject("user");
-            String user = userObject.getString("screen_name");
+            String user = userObject.getString("screenName");
             String text = tweet.getString("text");
 
             // Emit all the shit...stuff.
