@@ -39,14 +39,14 @@ public class FilterByHashtag implements IRichBolt {
         if (fields.contains("query")) {
             // Persist query.
             String query = (String) tuple.getValueByField("query");
-            _queries.put(query, query);
+            _queries.put(query.toLowerCase(), query);
         }
         else if (fields.contains("hashtag") && fields.contains("tweet")) {
             String hashtag = (String) tuple.getValueByField("hashtag");
             JSONObject tweet = (JSONObject) tuple.getValueByField("tweet");
 
             try {
-                if (_queries.containsKey(hashtag)) {
+                if (_queries.containsKey(hashtag.toLowerCase())) {
                     Timestamp.markWithTimestamp(tweet, "timestamp-filter");
                     System.out.println("[INFO] MATCH filter [" + hashtag + "]! in " + _threadName + " > " + tweet.getString("text").replace("\n", " "));
 
