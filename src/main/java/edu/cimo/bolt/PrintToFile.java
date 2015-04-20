@@ -81,28 +81,29 @@ public class PrintToFile implements IRichBolt {
     private synchronized void openFile(String query) throws IOException {
         FileWriter fileWriter = new FileWriter("/tmp/final-topology-" + query + ".csv", true);
         BufferedWriter writer = new BufferedWriter(fileWriter);
-        writer.write("timestamp-enter,timestamp-hashtag-extract,timestamp-filter,timestamp-data-extract," +
-                "timestamp-exit,total-time,created_at,id,user,text\n");
+        writer.write("timestamp-enter,timestamp-exit,timestamp-hashtag-extract,timestamp-filter,timestamp-data-extract," +
+                "total-time,created_at,id,user,text\n");
         _files.put(query, writer);
     }
 
     private synchronized void printToFile(String query, Tuple tweet) throws IOException, JSONException {
         HashMap<String, Long> times = (HashMap<String, Long>) tweet.getValueByField("times");
         long timeExit = System.nanoTime();
-        long tweetTime = timeExit - times.get("timestamp-enter");
+        long totalTime = timeExit - times.get("timestamp-enter");
         Long enterTime = times.get("timestamp-enter");
 
         // CSV format
-        _files.get(query).write("\"" + enterTime + "\","
-                + "\"" + ((Long )times.get("timestamp-hashtag-extract") - enterTime) + "\","
-                + "\"" + ((Long )times.get("timestamp-filter") - enterTime) + "\","
-                + "\"" + ((Long )times.get("timestamp-data-extract") - enterTime) + "\","
-                + "\"" + timeExit + "\","
-                + "\"" + tweetTime + "\","
-                + "\"" + tweet.getValueByField("created_at") + "\","
-                + "\"" + tweet.getValueByField("id") + "\","
-                + "\"" + tweet.getValueByField("user") + "\","
-                + "\"" + tweet.getValueByField("text").toString().replace("\n", " ") + "\""
+        _files.get(query).write(
+                "" + enterTime + ","
+                + "" + timeExit + ","
+                + "" + ((Long )times.get("timestamp-hashtag-extract") - enterTime) + ","
+                + "" + ((Long )times.get("timestamp-filter") - enterTime) + ","
+                + "" + ((Long )times.get("timestamp-data-extract") - enterTime) + ","
+                + "" + totalTime + "," // total time
+                + "" + tweet.getValueByField("created_at") + ","
+                + "" + tweet.getValueByField("id") + ","
+                + "" + tweet.getValueByField("user") + ","
+                + "" + tweet.getValueByField("text").toString().replace("\n", " ") + ""
                 + "\n");
         // Print tweet time in nanos, tweet ID : text
         // Format do Redis-u
