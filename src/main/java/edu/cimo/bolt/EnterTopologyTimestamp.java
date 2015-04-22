@@ -10,6 +10,8 @@ import backtype.storm.tuple.Values;
 import twitter4j.JSONException;
 import twitter4j.JSONObject;
 
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -65,6 +67,7 @@ public class EnterTopologyTimestamp implements IRichBolt {
      * @return Timestamped string line.
      */
     private synchronized void markWithTimestamp(JSONObject tweet, String attribute) throws JSONException {
+        tweet.put("timestamp", new Timestamp(System.currentTimeMillis()));
         tweet.put(attribute, System.nanoTime());
 
         /**

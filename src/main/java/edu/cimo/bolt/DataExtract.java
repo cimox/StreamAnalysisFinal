@@ -41,6 +41,7 @@ public class DataExtract implements IRichBolt {
             times.put("timestamp-hashtag-extract", tweet.getLong("timestamp-hashtag-extract"));
             times.put("timestamp-filter", tweet.getLong("timestamp-filter"));
             times.put("timestamp-data-extract", tweet.getLong("timestamp-data-extract"));
+            String timestamp = tweet.getString("timestamp");
             String created_at = tweet.getString("createdAt");
             String id = tweet.getString("id"); // This need to be just id if data coming from live stream
             JSONObject userObject = tweet.getJSONObject("user");
@@ -48,7 +49,7 @@ public class DataExtract implements IRichBolt {
             String text = tweet.getString("text");
 
             // Emit all the shit...stuff.
-            _collector.emit(new Values(hashtag, times, created_at, id, user, text));
+            _collector.emit(new Values(timestamp, hashtag, times, created_at, id, user, text));
         } catch (JSONException e) {
             System.err.println("[ERROR] in thread " + Thread.currentThread() + ": " + e.getMessage());
         }
@@ -64,7 +65,7 @@ public class DataExtract implements IRichBolt {
     @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
         // Emit all recorded times as map
-        outputFieldsDeclarer.declare(new Fields("hashtag", "times", "created_at", "id", "user", "text"));
+        outputFieldsDeclarer.declare(new Fields("timestamp", "hashtag", "times", "created_at", "id", "user", "text"));
     }
 
     @Override
