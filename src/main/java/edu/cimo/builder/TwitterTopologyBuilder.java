@@ -63,9 +63,12 @@ public class TwitterTopologyBuilder {
                 .shuffleGrouping("BOLT_hashtag-filter");
 
         // Finally, print filtered tweets to files.s
-        builder.setBolt("BOLT_print-to-file", new PrintToFile(), 4)
-                .fieldsGrouping("BOLT_data-extract", new Fields("hashtag"));
+//        builder.setBolt("BOLT_print-to-file", new PrintToFile(), 4)
+//                .fieldsGrouping("BOLT_data-extract", new Fields("hashtag"));
 
+        // Finally, print filtered tweets to Redis
+        builder.setBolt("BOLT_print-to-redis", new PrintToRedis(), 4)
+                .fieldsGrouping("BOLT_data-extract", new Fields("hashtag"));
 
         return builder.createTopology();
     }
