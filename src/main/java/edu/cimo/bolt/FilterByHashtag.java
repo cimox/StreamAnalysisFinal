@@ -39,7 +39,7 @@ public class FilterByHashtag implements IRichBolt {
         if (fields.contains("query")) {
             // Persist query.
             String query = (String) tuple.getValueByField("query");
-            _queries.put(query, query);
+            _queries.put(query.replace("\n",""), query.replace("\n",""));
         }
         else if (fields.contains("hashtag") && fields.contains("tweet")) {
             String hashtag = (String) tuple.getValueByField("hashtag");
